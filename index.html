@@ -545,7 +545,7 @@
         </div>
       </section>
 
-      <!-- TAB 2: DATA PROSES  -->
+      <!-- TAB 2: DATA PROSES -->
       <section id="tabProses" class="tab-section">
         <div class="proses-container">
           <div class="proses-header-bar">
@@ -558,7 +558,7 @@
         </div>
       </section>
 
-      <!-- TAB 3: SABRINA SCATTER  -->
+      <!-- TAB 3: SABRINA SCATTER -->
       <section id="tabSabrina" class="tab-section">
         <div class="proses-container">
           <div class="proses-header-bar">
@@ -571,7 +571,7 @@
         </div>
       </section>
 
-      <!-- TAB 4: PASSWORD GENERATOR LOKAL (SUDAH DIPERBAIKI) -->
+      <!-- TAB 4: PASSWORD GENERATOR -->
       <section id="tabPassword" class="tab-section">
         <div class="proses-container" style="padding: 0; overflow: hidden; height: 80vh; display: flex; flex-direction: column;">
           <div class="proses-header-bar" style="padding: 16px 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
@@ -1027,16 +1027,11 @@
       }, 2000);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // Jalankan awal
+    window.onload = function() {
       loadData();
-      loadDataProses();
-      loadDataSabrinaScatter();
       startLiveRandomizer();
-      
-      setInterval(loadData, 10000);
-      setInterval(loadDataProses, 15000);
-      setInterval(loadDataSabrinaScatter, 15000);
-    });
+    };
   </script>
 </body>
 </html>
