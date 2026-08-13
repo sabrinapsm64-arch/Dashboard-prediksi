@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg-dark: #0a0612;
-      --sidebar-bg: #22252e; /* UBAH: Sidebar warna abu-abu modern */
+      --sidebar-bg: #22252e;
       --card-bg: #170f2b;
       --card-border: rgba(124, 58, 237, 0.25);
       --accent-cyan: #00f2fe;
@@ -37,7 +37,7 @@
       min-height: 100vh;
     }
 
-    /* Sidebar Navigation - Warna Abu-abu */
+    /* Sidebar Navigation */
     .sidebar {
       width: 260px;
       background-color: var(--sidebar-bg);
@@ -142,7 +142,6 @@
       100% { transform: translateX(-100%); }
     }
 
-    /* UBAH: Status LIVE berganti warna ke Hijau Neon */
     .live-badge {
       background: rgba(0, 255, 136, 0.12);
       border: 1px solid var(--accent-green);
@@ -287,7 +286,6 @@
       text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
     }
 
-    /* ALL PASARAN LIST GRID STYLES */
     .section-header-title {
       font-size: 18px;
       font-weight: 900;
@@ -555,7 +553,7 @@
             <input type="text" id="searchProses" class="search-input" placeholder="🔍 Cari Data Proses..." onkeyup="filterTable('prosesTable', 'searchProses')">
           </div>
           <div id="prosesContent">
-            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data dari Sheet Proses...</p>
+            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data ...</p>
           </div>
         </div>
       </section>
@@ -568,19 +566,19 @@
             <input type="text" id="searchSabrina" class="search-input" placeholder="🔍 Cari User ID / Priode / SS..." onkeyup="filterTable('sabrinaTable', 'searchSabrina')">
           </div>
           <div id="sabrinaContent">
-            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data dari Sheet Sabrina Scatter...</p>
+            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data ...</p>
           </div>
         </div>
       </section>
 
-      <!-- TAB 4: PASSWORD GENERATOR LOKAL -->
+      <!-- TAB 4: PASSWORD GENERATOR LOKAL (SUDAH DIPERBAIKI) -->
       <section id="tabPassword" class="tab-section">
         <div class="proses-container" style="padding: 0; overflow: hidden; height: 80vh; display: flex; flex-direction: column;">
-          <div class="proses-header-bar" style="padding: 16px 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 0;">
+          <div class="proses-header-bar" style="padding: 16px 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title" style="text-align: left; margin-bottom: 0;">🔑 PASSWORD GENERATOR</h2>
-            <a href="file:///C:/Users/Goldenware/Downloads/password-generator.html" target="_blank" style="color: var(--accent-cyan); text-decoration: none; font-size: 12px; font-weight: 800; border: 1px solid var(--accent-cyan); padding: 8px 14px; border-radius: 6px; background: rgba(0,242,254,0.1);">↗ BUKA DI TAB BARU</a>
+            <a href="./password-generator.html" target="_blank" style="color: var(--accent-cyan); text-decoration: none; font-size: 12px; font-weight: 800; border: 1px solid var(--accent-cyan); padding: 8px 14px; border-radius: 6px; background: rgba(0,242,254,0.1);">↗ BUKA DI TAB BARU</a>
           </div>
-          <iframe src="file:///C:/Users/Goldenware/Downloads/password-generator.html" style="width: 100%; height: 100%; border: none; background: #ffffff;"></iframe>
+          <iframe src="./password-generator.html" style="width: 100%; height: 100%; border: none; background: transparent;"></iframe>
         </div>
       </section>
 
@@ -703,7 +701,7 @@
       document.body.appendChild(script);
     }
 
-    // 2. DATA SHEET PROSES (A2:G) - MENGHAPUS BARIS HEADER DUPLIKAT
+    // 2. DATA SHEET PROSES (A2:G)
     window.handleSheetProses = function(response) {
       const container = document.getElementById('prosesContent');
       if (!response || !response.table || !response.table.rows || response.table.rows.length === 0) {
@@ -756,7 +754,7 @@
       document.body.appendChild(script);
     }
 
-    // 3. DATA SHEET SABRINA SCATTER (C2:H) - MENGHAPUS BARIS HEADER DUPLIKAT
+    // 3. DATA SHEET SABRINA SCATTER (C2:H)
     window.handleSheetSabrinaScatter = function(response) {
       const container = document.getElementById('sabrinaContent');
       if (!response || !response.table || !response.table.rows || response.table.rows.length === 0) {
