@@ -7,14 +7,14 @@
   <style>
     :root {
       --bg-dark: #0a0612;
-      --sidebar-bg: #110b1f;
+      --sidebar-bg: #22252e; /* UBAH: Sidebar warna abu-abu modern */
       --card-bg: #170f2b;
       --card-border: rgba(124, 58, 237, 0.25);
       --accent-cyan: #00f2fe;
       --accent-purple: #6d28d9;
       --accent-green: #00ff88;
       --accent-red: #ff3366;
-      --text-muted: #8b85a1;
+      --text-muted: #9ca3af;
     }
 
     * {
@@ -37,11 +37,11 @@
       min-height: 100vh;
     }
 
-    /* Sidebar Navigation */
+    /* Sidebar Navigation - Warna Abu-abu */
     .sidebar {
       width: 260px;
       background-color: var(--sidebar-bg);
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
@@ -79,7 +79,7 @@
       gap: 10px;
       padding: 12px 14px;
       border-radius: 10px;
-      color: #c4b5fd;
+      color: #d1d5db;
       text-decoration: none;
       font-size: 13px;
       font-weight: 700;
@@ -89,11 +89,16 @@
       cursor: pointer;
     }
 
-    .menu-item.active {
-      background: rgba(109, 40, 217, 0.3);
-      border-color: rgba(167, 139, 250, 0.4);
+    .menu-item:hover {
+      background: rgba(255, 255, 255, 0.05);
       color: #ffffff;
-      box-shadow: 0 0 15px rgba(109, 40, 217, 0.2);
+    }
+
+    .menu-item.active {
+      background: rgba(109, 40, 217, 0.4);
+      border-color: rgba(167, 139, 250, 0.5);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(109, 40, 217, 0.3);
     }
 
     /* Main Area Right */
@@ -137,10 +142,11 @@
       100% { transform: translateX(-100%); }
     }
 
+    /* UBAH: Status LIVE berganti warna ke Hijau Neon */
     .live-badge {
-      background: rgba(255, 51, 102, 0.15);
-      border: 1px solid var(--accent-red);
-      color: var(--accent-red);
+      background: rgba(0, 255, 136, 0.12);
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
       padding: 8px 14px;
       border-radius: 20px;
       font-size: 12px;
@@ -150,13 +156,15 @@
       align-items: center;
       gap: 8px;
       white-space: nowrap;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
     }
 
     .live-dot {
       width: 8px;
       height: 8px;
-      background-color: var(--accent-red);
+      background-color: var(--accent-green);
       border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
       animation: pulse 1s infinite alternate;
     }
 
@@ -449,7 +457,7 @@
     @media (max-width: 850px) {
       .all-pasaran-grid { grid-template-columns: 1fr; }
       .app-container { flex-direction: column; }
-      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
       .top-bar { flex-direction: column; align-items: stretch; }
       .search-input { max-width: 100%; }
     }
@@ -470,7 +478,13 @@
           <span>📊</span> PREDIKSI
         </div>
         <div id="btnTabProses" class="menu-item" onclick="switchTab('proses')">
-          <span>📋</span> PROSES
+          <span>📋</span> DATA PROSES 
+        </div>
+        <div id="btnTabSabrina" class="menu-item" onclick="switchTab('sabrina')">
+          <span>💎</span> SABRINA SCATTER 
+        </div>
+        <div id="btnTabPassword" class="menu-item" onclick="switchTab('password')">
+          <span>🔑</span> PASSWORD GENERATOR
         </div>
       </nav>
     </aside>
@@ -490,7 +504,6 @@
 
       <!-- TAB 1: PREDIKSI -->
       <section id="tabPrediksi" class="tab-section active">
-        <!-- SELECTOR PASARAN CEPAT -->
         <div class="dashboard-grid">
           <div class="card">
             <h2 class="card-title">PILIH PASARAN HARI INI</h2>
@@ -511,7 +524,6 @@
           </div>
         </div>
 
-        <!-- DAFTAR SEMUA PASARAN LENGKAP -->
         <div class="section-header-title">
           <span>🔥</span> SEMUA PASARAN PREDIKSI
         </div>
@@ -535,17 +547,40 @@
         </div>
       </section>
 
-      <!-- TAB 2: PROSES -->
+      <!-- TAB 2: DATA PROSES  -->
       <section id="tabProses" class="tab-section">
         <div class="proses-container">
           <div class="proses-header-bar">
-            <h2 class="card-title" style="text-align: left; margin-bottom: 0;">DATA PENTING YANG SUDAH DI PROSES</h2>
-            <input type="text" id="searchProses" class="search-input" placeholder="🔍 Cari User ID / Periode..." onkeyup="filterProsesTable()">
+            <h2 class="card-title" style="text-align: left; margin-bottom: 0;">DATA PROSES </h2>
+            <input type="text" id="searchProses" class="search-input" placeholder="🔍 Cari Data Proses..." onkeyup="filterTable('prosesTable', 'searchProses')">
           </div>
-
           <div id="prosesContent">
-            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data penting dari Sheet Proses...</p>
+            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data dari Sheet Proses...</p>
           </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SABRINA SCATTER  -->
+      <section id="tabSabrina" class="tab-section">
+        <div class="proses-container">
+          <div class="proses-header-bar">
+            <h2 class="card-title" style="text-align: left; margin-bottom: 0;">DATA SABRINA SCATTER </h2>
+            <input type="text" id="searchSabrina" class="search-input" placeholder="🔍 Cari User ID / Priode / SS..." onkeyup="filterTable('sabrinaTable', 'searchSabrina')">
+          </div>
+          <div id="sabrinaContent">
+            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data dari Sheet Sabrina Scatter...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: PASSWORD GENERATOR LOKAL -->
+      <section id="tabPassword" class="tab-section">
+        <div class="proses-container" style="padding: 0; overflow: hidden; height: 80vh; display: flex; flex-direction: column;">
+          <div class="proses-header-bar" style="padding: 16px 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 0;">
+            <h2 class="card-title" style="text-align: left; margin-bottom: 0;">🔑 PASSWORD GENERATOR</h2>
+            <a href="file:///C:/Users/Goldenware/Downloads/password-generator.html" target="_blank" style="color: var(--accent-cyan); text-decoration: none; font-size: 12px; font-weight: 800; border: 1px solid var(--accent-cyan); padding: 8px 14px; border-radius: 6px; background: rgba(0,242,254,0.1);">↗ BUKA DI TAB BARU</a>
+          </div>
+          <iframe src="file:///C:/Users/Goldenware/Downloads/password-generator.html" style="width: 100%; height: 100%; border: none; background: #ffffff;"></iframe>
         </div>
       </section>
 
@@ -562,12 +597,16 @@
     let randomizeInterval = null;
     let lastDateCheck = '';
 
-    // Switch Tab Menu Navigasi
     function switchTab(tabName) {
       document.getElementById('btnTabPrediksi').classList.remove('active');
       document.getElementById('btnTabProses').classList.remove('active');
+      document.getElementById('btnTabSabrina').classList.remove('active');
+      document.getElementById('btnTabPassword').classList.remove('active');
+
       document.getElementById('tabPrediksi').classList.remove('active');
       document.getElementById('tabProses').classList.remove('active');
+      document.getElementById('tabSabrina').classList.remove('active');
+      document.getElementById('tabPassword').classList.remove('active');
 
       if (tabName === 'prediksi') {
         document.getElementById('btnTabPrediksi').classList.add('active');
@@ -576,10 +615,16 @@
         document.getElementById('btnTabProses').classList.add('active');
         document.getElementById('tabProses').classList.add('active');
         loadDataProses();
+      } else if (tabName === 'sabrina') {
+        document.getElementById('btnTabSabrina').classList.add('active');
+        document.getElementById('tabSabrina').classList.add('active');
+        loadDataSabrinaScatter();
+      } else if (tabName === 'password') {
+        document.getElementById('btnTabPassword').classList.add('active');
+        document.getElementById('tabPassword').classList.add('active');
       }
     }
 
-    // Tanggal Dinamis Presisi Sesuai Zona Waktu Lokal
     function getTanggalDynamic(offsetDays = 0) {
       const now = new Date();
       now.setDate(now.getDate() + offsetDays);
@@ -658,7 +703,7 @@
       document.body.appendChild(script);
     }
 
-    // 2. DATA SHEET PROSES (B2:G)
+    // 2. DATA SHEET PROSES (A2:G) - MENGHAPUS BARIS HEADER DUPLIKAT
     window.handleSheetProses = function(response) {
       const container = document.getElementById('prosesContent');
       if (!response || !response.table || !response.table.rows || response.table.rows.length === 0) {
@@ -667,17 +712,22 @@
       }
 
       const rows = response.table.rows;
-      const headers = ['TANGGAL', 'USER ID', 'PERIODE', 'SCREENSHOT', 'BETTINGAN', 'BERAPA SCATTER'];
+      const headers = ['NO / TIMESTAMP', 'TANGGAL', 'USER ID', 'PERIODE', 'SCREENSHOT', 'BETTINGAN', 'BERAPA SCATTER'];
 
-      let html = '<table class="proses-table"><thead><tr>';
+      let html = '<table id="prosesTable" class="proses-table"><thead><tr>';
       headers.forEach(header => {
         html += `<th>${header}</th>`;
       });
       html += '</tr></thead><tbody>';
 
       rows.forEach(row => {
-        html += '<tr>';
         if (row.c) {
+          let vals = row.c.map(cell => extractCellText(cell).toUpperCase());
+          
+          const isHeaderRow = vals.some(v => ['USERID', 'PERIODE', 'SS', 'BETT', 'SCATTER'].includes(v));
+          if (isHeaderRow) return;
+
+          html += '<tr>';
           row.c.forEach(cell => {
             let val = extractCellText(cell);
             if (val.startsWith('http://') || val.startsWith('https://')) {
@@ -685,14 +735,14 @@
             }
             html += `<td>${val || '-'}</td>`;
           });
+          html += '</tr>';
         }
-        html += '</tr>';
       });
 
       html += '</tbody></table>';
       container.innerHTML = html;
 
-      filterProsesTable();
+      filterTable('prosesTable', 'searchProses');
     };
 
     function loadDataProses() {
@@ -701,17 +751,71 @@
 
       const script = document.createElement('script');
       script.id = 'jsonp-proses-script';
-      const tqQuery = encodeURIComponent("SELECT B, C, D, E, F, G");
+      const tqQuery = encodeURIComponent("SELECT A, B, C, D, E, F, G");
       script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=Proses&tq=${tqQuery}&tqx=responseHandler:handleSheetProses`;
       document.body.appendChild(script);
     }
 
-    function filterProsesTable() {
-      const input = document.getElementById('searchProses');
+    // 3. DATA SHEET SABRINA SCATTER (C2:H) - MENGHAPUS BARIS HEADER DUPLIKAT
+    window.handleSheetSabrinaScatter = function(response) {
+      const container = document.getElementById('sabrinaContent');
+      if (!response || !response.table || !response.table.rows || response.table.rows.length === 0) {
+        container.innerHTML = '<p style="color: var(--accent-red);">Data sheet Sabrina Scatter kosong atau tidak dapat diakses.</p>';
+        return;
+      }
+
+      const rows = response.table.rows;
+      const headers = ['TANGGAL', 'USER ID', 'PRIODE', 'SS SEAMLESS', 'NOMINAL', 'TOTAL KLAIM'];
+
+      let html = '<table id="sabrinaTable" class="proses-table"><thead><tr>';
+      headers.forEach(header => {
+        html += `<th>${header}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      rows.forEach(row => {
+        if (row.c) {
+          let vals = row.c.map(cell => extractCellText(cell).toUpperCase());
+          
+          const isHeaderRow = vals.some(v => ['USER ID', 'USERID', 'PRIODE', 'PERIODE', 'SS SEAMLESS', 'NOMINAL', 'TOTAL KLAIM'].includes(v));
+          if (isHeaderRow) return;
+
+          html += '<tr>';
+          row.c.forEach(cell => {
+            let val = extractCellText(cell);
+            if (val.startsWith('http://') || val.startsWith('https://')) {
+              val = `<a href="${val}" target="_blank" rel="noopener noreferrer">${val}</a>`;
+            }
+            html += `<td>${val || '-'}</td>`;
+          });
+          html += '</tr>';
+        }
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+
+      filterTable('sabrinaTable', 'searchSabrina');
+    };
+
+    function loadDataSabrinaScatter() {
+      const oldScript = document.getElementById('jsonp-sabrina-script');
+      if (oldScript) oldScript.remove();
+
+      const script = document.createElement('script');
+      script.id = 'jsonp-sabrina-script';
+      const sheetName = encodeURIComponent('Sabrina scatter');
+      const tqQuery = encodeURIComponent("SELECT C, D, E, F, G, H");
+      script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${sheetName}&tq=${tqQuery}&tqx=responseHandler:handleSheetSabrinaScatter`;
+      document.body.appendChild(script);
+    }
+
+    function filterTable(tableId, inputId) {
+      const input = document.getElementById(inputId);
       if (!input) return;
 
       const filter = input.value.toUpperCase().trim();
-      const table = document.querySelector('.proses-table');
+      const table = document.getElementById(tableId);
       if (!table) return;
 
       const tbody = table.querySelector('tbody');
@@ -785,7 +889,6 @@
       }).join('\n');
     }
 
-    // RENDER SELURUH DAFTAR PASARAN OTOMATIS
     function renderAllPasaranList() {
       const containerHariIni = document.getElementById('containerAllHariIni');
       const containerBesok = document.getElementById('containerAllBesok');
@@ -819,7 +922,6 @@
       containerBesok.innerHTML = htmlBesok;
     }
 
-    // FITUR SALIN SEMUA PASARAN SEKALIGUS
     function salinSemuaPasaran(offsetDays = 0) {
       if (allParsedBlocks.length === 0) {
         alert('Data pasaran belum siap/kosong!');
@@ -839,7 +941,6 @@
         }
       });
 
-      // Menggabungkan seluruh teks dengan pemisah 2 baris baru
       const resultText = fullTextArray.join('\n\n');
 
       navigator.clipboard.writeText(resultText).then(() => {
@@ -873,7 +974,6 @@
           populateDropdowns();
         }
 
-        // Live randomize dropdown selection
         ['hariIni', 'besok'].forEach(type => {
           const select = document.getElementById(type === 'hariIni' ? 'selectHariIni' : 'selectBesok');
           const resultBox = document.getElementById(type === 'hariIni' ? 'resultHariIni' : 'resultBesok');
@@ -886,7 +986,6 @@
           }
         });
 
-        // Live randomize ALL pasaran cards
         allParsedBlocks.forEach((item, index) => {
           const elemHariIni = document.getElementById(`textHariIni_${index}`);
           const elemBesok = document.getElementById(`textBesok_${index}`);
@@ -933,10 +1032,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadData();
       loadDataProses();
+      loadDataSabrinaScatter();
       startLiveRandomizer();
       
       setInterval(loadData, 10000);
       setInterval(loadDataProses, 15000);
+      setInterval(loadDataSabrinaScatter, 15000);
     });
   </script>
 </body>
