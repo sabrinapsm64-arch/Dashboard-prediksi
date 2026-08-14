@@ -1006,10 +1006,19 @@
       lastDateCheck = todayStr;
     }
 
+    // --- FUNGSI FORMAT PREDIKSI DENGAN PERBAIKAN LOGIKA TWIN & INVEST TWIN ---
     function formatPrediksiLive(item, offsetDays = 0) {
       if (!item || !item.lines) return '';
 
       const targetDateStr = getTanggalDynamic(offsetDays);
+
+      // Buat pool twin (00 - 99) dan kocok urutannya untuk pasaran ini
+      const twinPool = ['00', '11', '22', '33', '44', '55', '66', '77', '88', '99'];
+      const shuffledTwins = [...twinPool].sort(() => 0.5 - Math.random());
+      
+      // Ambil twin set yang konsisten
+      const twinUtamaText = shuffledTwins.slice(0, 3).join(' / ');
+      const investTwinText = shuffledTwins.slice(0, 5).join(' / ');
 
       return item.lines.map((line, index) => {
         if (index === 0) return line;
@@ -1019,6 +1028,17 @@
           return targetDateStr;
         }
 
+        // Tangani baris TWIN
+        if (/^TWIN/i.test(line)) {
+          return `TWIN ${twinUtamaText}`;
+        }
+
+        // Tangani baris INVEST TWIN
+        if (/^INVEST TWIN/i.test(line)) {
+          return `INVEST TWIN ${investTwinText}`;
+        }
+
+        // Untuk baris lainnya, lakukan pengacakan angka acak biasa
         return line.replace(/\b\d+\b/g, (match) => {
           let randomDigits = '';
           for (let i = 0; i < match.length; i++) {
