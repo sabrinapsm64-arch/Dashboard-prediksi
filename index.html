@@ -438,6 +438,104 @@
       text-decoration: underline;
     }
 
+    /* Password Generator Custom Styles */
+    .pg-box {
+      max-width: 550px;
+      margin: 20px auto;
+      background: #120b22;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .pg-display {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .pg-input {
+      flex: 1;
+      background: #0f0a1d;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      border-radius: 8px;
+      color: var(--accent-green);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 12px 16px;
+      letter-spacing: 2px;
+      outline: none;
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+    }
+
+    .pg-copy-btn {
+      background: var(--accent-purple);
+      color: #ffffff;
+      border: none;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pg-copy-btn:hover {
+      background: #7c3aed;
+    }
+
+    .pg-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .pg-option-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #d1d5db;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .pg-option-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-purple);
+      cursor: pointer;
+    }
+
+    .pg-slider-group {
+      grid-column: span 2;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .pg-slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #d1d5db;
+      font-weight: 700;
+    }
+
+    .pg-slider {
+      width: 100%;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
     .toast {
       position: fixed;
       bottom: 20px;
@@ -458,6 +556,8 @@
       .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
       .top-bar { flex-direction: column; align-items: stretch; }
       .search-input { max-width: 100%; }
+      .pg-options { grid-template-columns: 1fr; }
+      .pg-slider-group { grid-column: span 1; }
     }
   </style>
 </head>
@@ -573,19 +673,58 @@
 
       <!-- TAB 4: PASSWORD GENERATOR -->
       <section id="tabPassword" class="tab-section">
-        <div class="proses-container" style="padding: 0; overflow: hidden; height: 80vh; display: flex; flex-direction: column;">
-          <div class="proses-header-bar" style="padding: 16px 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+        <div class="proses-container">
+          <div class="proses-header-bar">
             <h2 class="card-title" style="text-align: left; margin-bottom: 0;">🔑 PASSWORD GENERATOR</h2>
-            <a href="./password-generator.html" target="_blank" style="color: var(--accent-cyan); text-decoration: none; font-size: 12px; font-weight: 800; border: 1px solid var(--accent-cyan); padding: 8px 14px; border-radius: 6px; background: rgba(0,242,254,0.1);">↗ BUKA DI TAB BARU</a>
           </div>
-          <iframe src="./password-generator.html" style="width: 100%; height: 100%; border: none; background: transparent;"></iframe>
+
+          <div class="pg-box">
+            <div class="pg-display">
+              <input type="text" id="pgOutput" class="pg-input" readonly placeholder="Klik 'Buat Password'">
+              <button class="pg-copy-btn" onclick="copyPassword()">SALIN</button>
+            </div>
+
+            <div class="pg-options">
+              <div class="pg-slider-group">
+                <div class="pg-slider-header">
+                  <span>Panjang Password:</span>
+                  <span id="pgLengthVal" style="color: var(--accent-cyan);">12</span>
+                </div>
+                <input type="range" id="pgLength" class="pg-slider" min="6" max="32" value="12" oninput="document.getElementById('pgLengthVal').innerText = this.value">
+              </div>
+
+              <label class="pg-option-item">
+                <input type="checkbox" id="pgUpper" checked>
+                <span>Huruf Besar (A-Z)</span>
+              </label>
+
+              <label class="pg-option-item">
+                <input type="checkbox" id="pgLower" checked>
+                <span>Huruf Kecil (a-z)</span>
+              </label>
+
+              <label class="pg-option-item">
+                <input type="checkbox" id="pgNumbers" checked>
+                <span>Angka (0-9)</span>
+              </label>
+
+              <label class="pg-option-item">
+                <input type="checkbox" id="pgSymbols" checked>
+                <span>Simbol (!@#$%^&*)</span>
+              </label>
+            </div>
+
+            <button class="btn-salin-all" style="margin-bottom: 0;" onclick="generatePassword()">
+              ⚡ BUAT PASSWORD BARU
+            </button>
+          </div>
         </div>
       </section>
 
     </main>
   </div>
 
-  <div id="toast" class="toast">✓ Prediksi Berhasil Disalin!</div>
+  <div id="toast" class="toast">✓ Berhasil Disalin!</div>
 
   <script>
     const SPREADSHEET_ID = '1uhbzlFVVfNhPtOhUrNBay-HesK5PN-LrKXiwipxq86E';
@@ -620,6 +759,9 @@
       } else if (tabName === 'password') {
         document.getElementById('btnTabPassword').classList.add('active');
         document.getElementById('tabPassword').classList.add('active');
+        if (!document.getElementById('pgOutput').value) {
+          generatePassword();
+        }
       }
     }
 
@@ -1015,6 +1157,50 @@
       if (!elem) return;
 
       navigator.clipboard.writeText(elem.innerText).then(() => {
+        showToast();
+      });
+    }
+
+    // 4. LOGIKA PASSWORD GENERATOR
+    function generatePassword() {
+      const length = parseInt(document.getElementById('pgLength').value);
+      const incUpper = document.getElementById('pgUpper').checked;
+      const incLower = document.getElementById('pgLower').checked;
+      const incNumbers = document.getElementById('pgNumbers').checked;
+      const incSymbols = document.getElementById('pgSymbols').checked;
+
+      const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+      const numberChars = '0123456789';
+      const symbolChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+      let charPool = '';
+      if (incUpper) charPool += upperChars;
+      if (incLower) charPool += lowerChars;
+      if (incNumbers) charPool += numberChars;
+      if (incSymbols) charPool += symbolChars;
+
+      if (charPool === '') {
+        alert('Pilih minimal satu jenis karakter!');
+        return;
+      }
+
+      let password = '';
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charPool.length);
+        password += charPool.charAt(randomIndex);
+      }
+
+      document.getElementById('pgOutput').value = password;
+    }
+
+    function copyPassword() {
+      const passVal = document.getElementById('pgOutput').value;
+      if (!passVal) {
+        alert('Buat password terlebih dahulu!');
+        return;
+      }
+      navigator.clipboard.writeText(passVal).then(() => {
         showToast();
       });
     }
