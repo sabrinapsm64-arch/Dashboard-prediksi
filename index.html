@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Prediksi & Data Proses Live</title>
+  <style>
+    :root {
+      --bg-dark: #0a0612;
+      --sidebar-bg: #22252e;
+      --card-bg: #170f2b;
+      --card-border: rgba(124, 58, 237, 0.25);
+      --accent-cyan: #00f2fe;
+      --accent-purple: #6d28d9;
+      --accent-green: #00ff88;
+      --accent-red: #ff3366;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .app-container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 260px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      margin-bottom: 30px;
+    }
+
+    .brand-logo .cyan { color: var(--accent-cyan); }
+    .brand-logo .sub { font-size: 13px; color: #a78bfa; font-weight: 600; margin-left: 4px; }
+
+    .menu-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: #d1d5db;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+
+    .menu-item.active {
+      background: rgba(109, 40, 217, 0.4);
+      border-color: rgba(167, 139, 250, 0.5);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(109, 40, 217, 0.3);
+    }
+
+    /* Main Area Right */
+    .main-content {
+      flex: 1;
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+
+    /* Header Live Status */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+
+    .ticker-container {
+      flex: 1;
+      border: 1px solid rgba(234, 179, 8, 0.6);
+      background: rgba(17, 11, 31, 0.8);
+      border-radius: 8px;
+      padding: 10px 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ticker-text {
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #ffffff;
+      animation: tickerAnimation 18s linear infinite;
+    }
+
+    @keyframes tickerAnimation {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .live-badge {
+      background: rgba(0, 255, 136, 0.12);
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.3; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* Tab Section Styles */
+    .tab-section {
+      display: none;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .select-box {
+      width: 100%;
+      background: #21163b;
+      border: 1px solid rgba(167, 139, 250, 0.25);
+      border-radius: 8px;
+      color: #ffffff;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .select-box:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .btn-salin {
+      width: 100%;
+      background: linear-gradient(180deg, #5b21b6 0%, #3b0764 100%);
+      border: 1px solid rgba(167, 139, 250, 0.3);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-salin:hover {
+      background: linear-gradient(180deg, #6d28d9 0%, #4c1d95 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-salin-all {
+      width: 100%;
+      background: linear-gradient(180deg, #059669 0%, #064e3b 100%);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 12px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-salin-all:hover {
+      background: linear-gradient(180deg, #10b981 0%, #047857 100%);
+      transform: translateY(-1px);
+    }
+
+    .prediksi-result {
+      width: 100%;
+      margin-top: 16px;
+      background: #0f0a1d;
+      border: 1px dashed rgba(167, 139, 250, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 13px;
+      color: var(--accent-green);
+      font-family: 'Courier New', Courier, monospace;
+      display: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+    }
+
+    .section-header-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--accent-cyan);
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .all-pasaran-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .pasaran-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .column-header {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: #ffffff;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .pasaran-card-box {
+      background: #120b22;
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .pasaran-card-box:hover {
+      border-color: var(--accent-purple);
+      box-shadow: 0 4px 20px rgba(109, 40, 217, 0.25);
+    }
+
+    .pasaran-card-text {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px;
+      color: #ffffff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .copy-btn-mini {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent-purple);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .copy-btn-mini:hover {
+      background: #7c3aed;
+    }
+
+    /* Tabel Data Proses & Search Bar */
+    .proses-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      overflow-x: auto;
+    }
+
+    .proses-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      max-width: 380px;
+      background: #21163b;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      border-radius: 8px;
+      color: #ffffff;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+    }
+
+    .proses-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .proses-table th, .proses-table td {
+      padding: 12px 16px;
+      border: 1px solid rgba(167, 139, 250, 0.15);
+      word-break: break-word;
+    }
+
+    .proses-table th {
+      background-color: #21163b;
+      color: var(--accent-cyan);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .proses-table tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .proses-table tr:hover {
+      background-color: rgba(109, 40, 217, 0.15);
+    }
+
+    .proses-table a {
+      color: var(--accent-cyan);
+      text-decoration: underline;
+    }
+
+    /* Password Generator Custom Styles */
+    .pg-box {
+      max-width: 550px;
+      margin: 20px auto;
+      background: #120b22;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .pg-display {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .pg-input {
+      flex: 1;
+      background: #0f0a1d;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      border-radius: 8px;
+      color: var(--accent-green);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 12px 16px;
+      letter-spacing: 2px;
+      outline: none;
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+    }
+
+    .pg-copy-btn {
+      background: var(--accent-purple);
+      color: #ffffff;
+      border: none;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pg-copy-btn:hover {
+      background: #7c3aed;
+    }
+
+    .pg-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .pg-option-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #d1d5db;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .pg-option-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-purple);
+      cursor: pointer;
+    }
+
+    .pg-slider-group {
+      grid-column: span 2;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .pg-slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #d1d5db;
+      font-weight: 700;
+    }
+
+    .pg-slider {
+      width: 100%;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--accent-green);
+      color: #000;
+      font-weight: 800;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 999;
+    }
+
+    @media (max-width: 850px) {
+      .all-pasaran-grid { grid-template-columns: 1fr; }
+      .app-container { flex-direction: column; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+      .top-bar { flex-direction: column; align-items: stretch; }
+      .search-input { max-width: 100%; }
+      .pg-options { grid-template-columns: 1fr; }
+      .pg-slider-group { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="brand-logo">
+        <span class="cyan">Prediksi Pasaran Jitu</span> <span class="sub">By Sabrina</span>
+      </div>
+
+      <div class="menu-section-label">MENU DASHBOARD</div>
+
+      <nav class="menu-list">
+        <div id="btnTabPrediksi" class="menu-item active" onclick="switchTab('prediksi')">
+          <span>📊</span> PREDIKSI
+        </div>
+        <div id="btnTabProses" class="menu-item" onclick="switchTab('proses')">
+          <span>📋</span> DATA PROSES 
+        </div>
+        <div id="btnTabSabrina" class="menu-item" onclick="switchTab('sabrina')">
+          <span>💎</span> SABRINA SCATTER 
+        </div>
+        <div id="btnTabPassword" class="menu-item" onclick="switchTab('password')">
+          <span>🔑</span> PASSWORD GENERATOR
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <div class="ticker-container">
+          <div class="ticker-text">
+            DASHBOARD PREDIKSI TOGEL & DATA PROSES &nbsp;&bull;&nbsp; UPDATE OTOMATIS BERJALAN &nbsp;&bull;&nbsp; DATA DISIMPAN AMAN
+          </div>
+        </div>
+        <div class="live-badge">
+          <span class="live-dot"></span>
+          LIVE UPDATING (2s)
+        </div>
+      </div>
+
+      <!-- TAB 1: PREDIKSI -->
+      <section id="tabPrediksi" class="tab-section active">
+        <div class="dashboard-grid">
+          <div class="card">
+            <h2 class="card-title">PILIH PASARAN HARI INI</h2>
+            <select id="selectHariIni" class="select-box" onchange="displayPrediksi('hariIni')">
+              <option value="">-- MEMUAT DATA --</option>
+            </select>
+            <button class="btn-salin" onclick="salinText('hariIni')">SALIN PREDIKSI</button>
+            <div id="resultHariIni" class="prediksi-result"></div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">PILIH PASARAN BESOK</h2>
+            <select id="selectBesok" class="select-box" onchange="displayPrediksi('besok')">
+              <option value="">-- MEMUAT DATA --</option>
+            </select>
+            <button class="btn-salin" onclick="salinText('besok')">SALIN PREDIKSI</button>
+            <div id="resultBesok" class="prediksi-result"></div>
+          </div>
+        </div>
+
+        <div class="section-header-title">
+          <span>🔥</span> SEMUA PASARAN PREDIKSI
+        </div>
+
+        <div class="all-pasaran-grid">
+          <div class="pasaran-column">
+            <div class="column-header">PASARAN HARI INI</div>
+            <button class="btn-salin-all" onclick="salinSemuaPasaran(0)">📋 SALIN SEMUA PASARAN HARI INI</button>
+            <div id="containerAllHariIni">
+              <p style="color: var(--text-muted); font-size: 13px;">Memuat semua pasaran hari ini...</p>
+            </div>
+          </div>
+
+          <div class="pasaran-column">
+            <div class="column-header">PASARAN BESOK</div>
+            <button class="btn-salin-all" onclick="salinSemuaPasaran(1)">📋 SALIN SEMUA PASARAN BESOK</button>
+            <div id="containerAllBesok">
+              <p style="color: var(--text-muted); font-size: 13px;">Memuat semua pasaran besok...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DATA PROSES -->
+      <section id="tabProses" class="tab-section">
+        <div class="proses-container">
+          <div class="proses-header-bar">
+            <h2 class="card-title" style="text-align: left; margin-bottom: 0;">DATA PROSES </h2>
+            <input type="text" id="searchProses" class="search-input" placeholder="🔍 Cari Data Proses..." onkeyup="filterTable('prosesTable', 'searchProses')">
+          </div>
+          <div id="prosesContent">
+            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data ...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SABRINA SCATTER -->
+      <section id="tabSabrina" class="tab-section">
+        <div class="proses-container">
+          <div class="proses-header-bar">
+            <h2 class="card-title" style="text-align: left; margin-bottom: 0;">DATA SABRINA SCATTER </h2>
+            <input type="text" id="searchSabrina" class="search-input" placeholder="🔍 Cari User ID / Priode / SS..." onkeyup="filterTable('sabrinaTable', 'searchSabrina')">
+          </div>
+          <div id="sabrinaContent">
+            <p style="color: var(--text-muted); font-size: 13px;">Sedang memuat data ...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: PASSWORD GENERATOR -->
+      <section id="tabPassword" class="tab-section">
+        <div class="proses-container">
+          <div class="proses-header-bar">
+            <h2 class="card-title" style="text-align: left; margin-bottom: 0;">🔑 PASSWORD GENERATOR</h2>
+          </div>
+
+          <div class="pg-box">
+            <div class="pg-display">
+              <input type="text" id="pgOutput" class="pg-input" readonly placeholder="Klik 'Buat Password'">
+              <button class="pg-copy-btn" onclick="copyPassword()">SALIN</button>
+            </div>
+
+            <div class="pg-options">
+              <div class="pg-slider-group">
+                <div class="pg-slider-header">
+                  <span>Panjang Password:</span>
+                  <span id="pgLengthVal" style="color: var(--accent-cyan);">12</span>
+                </div>
+                <input type="range" id="pgLength" class="pg-slider" min="6" max="32" value="12" oninput="document.getElementById('pgLengthVal').innerText = this.value">
+              </div>
+
+              <label class="pg-option-item">
+                <input type="checkbox" id="pgUpper" checked>
+                <span>Huruf Besar (A-Z)</span>
+              </label>
+
+              <label class="pg-option-item">
+                <input type="checkbox" id="pgLower" checked>
+                <span>Huruf Kecil (a-z)</span>
+              </label>
+
+              <label class="pg-option-item">
+                <input type="checkbox" id="pgNumbers" checked>
+                <span>Angka (0-9)</span>
+              </label>
+
+              <label class="pg-option-item">
+                <input type="checkbox" id="pgSymbols" checked>
+                <span>Simbol (!@#$%^&*)</span>
+              </label>
+            </div>
+
+            <button class="btn-salin-all" style="margin-bottom: 0;" onclick="generatePassword()">
+              ⚡ BUAT PASSWORD BARU
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="toast" class="toast">✓ Berhasil Disalin!</div>
+
+  <script>
+    const SPREADSHEET_ID = '1uhbzlFVVfNhPtOhUrNBay-HesK5PN-LrKXiwipxq86E';
+    const GID_PASARAN = '584155911'; 
+
+    let allParsedBlocks = [];
+    let randomizeInterval = null;
+    let lastDateCheck = '';
+
+    function switchTab(tabName) {
+      document.getElementById('btnTabPrediksi').classList.remove('active');
+      document.getElementById('btnTabProses').classList.remove('active');
+      document.getElementById('btnTabSabrina').classList.remove('active');
+      document.getElementById('btnTabPassword').classList.remove('active');
+
+      document.getElementById('tabPrediksi').classList.remove('active');
+      document.getElementById('tabProses').classList.remove('active');
+      document.getElementById('tabSabrina').classList.remove('active');
+      document.getElementById('tabPassword').classList.remove('active');
+
+      if (tabName === 'prediksi') {
+        document.getElementById('btnTabPrediksi').classList.add('active');
+        document.getElementById('tabPrediksi').classList.add('active');
+      } else if (tabName === 'proses') {
+        document.getElementById('btnTabProses').classList.add('active');
+        document.getElementById('tabProses').classList.add('active');
+        loadDataProses();
+      } else if (tabName === 'sabrina') {
+        document.getElementById('btnTabSabrina').classList.add('active');
+        document.getElementById('tabSabrina').classList.add('active');
+        loadDataSabrinaScatter();
+      } else if (tabName === 'password') {
+        document.getElementById('btnTabPassword').classList.add('active');
+        document.getElementById('tabPassword').classList.add('active');
+        if (!document.getElementById('pgOutput').value) {
+          generatePassword();
+        }
+      }
+    }
+
+    function getTanggalDynamic(offsetDays = 0) {
+      const now = new Date();
+      now.setDate(now.getDate() + offsetDays);
+
+      const str = now.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+
+      return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    function extractCellText(cell) {
+      if (!cell) return '';
+      if (cell.f !== undefined && cell.f !== null) return String(cell.f).trim();
+      if (cell.v !== undefined && cell.v !== null) return String(cell.v).trim();
+      return '';
+    }
+
+    // 1. DATA PREDIKSI PASARAN
+    window.handleSheetData = function(response) {
+      if (!response || !response.table || !response.table.rows) return;
+
+      const rows = response.table.rows;
+      allParsedBlocks = [];
+
+      let rawLines = [];
+      rows.forEach(row => {
+        if (row.c && row.c[0]) {
+          let txt = extractCellText(row.c[0]);
+          if (txt) rawLines.push(txt);
+        }
+      });
+
+      let currentBlock = [];
+      for (let i = 0; i < rawLines.length; i++) {
+        let line = rawLines[i];
+
+        if (line.includes('---')) {
+          if (currentBlock.length > 0) {
+            parseBlockData(currentBlock);
+            currentBlock = [];
+          }
+        } else {
+          currentBlock.push(line);
+        }
+      }
+
+      if (currentBlock.length > 0) {
+        parseBlockData(currentBlock);
+      }
+
+      populateDropdowns();
+      renderAllPasaranList();
+    };
+
+    function parseBlockData(lines) {
+      if (lines.length < 2) return;
+      let name = lines[0];
+
+      allParsedBlocks.push({
+        name: name,
+        lines: lines
+      });
+    }
+
+    function loadData() {
+      const oldScript = document.getElementById('jsonp-fetch-script');
+      if (oldScript) oldScript.remove();
+
+      const script = document.createElement('script');
+      script.id = 'jsonp-fetch-script';
+      script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=responseHandler:handleSheetData&gid=${GID_PASARAN}`;
+      document.body.appendChild(script);
+    }
+
+    // 2. DATA SHEET PROSES (A2:G)
+    window.handleSheetProses = function(response) {
+      const container = document.getElementById('prosesContent');
+      if (!response || !response.table || !response.table.rows || response.table.rows.length === 0) {
+        container.innerHTML = '<p style="color: var(--accent-red);">Data sheet Proses kosong atau tidak dapat diakses.</p>';
+        return;
+      }
+
+      const rows = response.table.rows;
+      const headers = ['NO / TIMESTAMP', 'TANGGAL', 'USER ID', 'PERIODE', 'SCREENSHOT', 'BETTINGAN', 'BERAPA SCATTER'];
+
+      let html = '<table id="prosesTable" class="proses-table"><thead><tr>';
+      headers.forEach(header => {
+        html += `<th>${header}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      rows.forEach(row => {
+        if (row.c) {
+          let vals = row.c.map(cell => extractCellText(cell).toUpperCase());
+          
+          const isHeaderRow = vals.some(v => ['USERID', 'PERIODE', 'SS', 'BETT', 'SCATTER'].includes(v));
+          if (isHeaderRow) return;
+
+          html += '<tr>';
+          row.c.forEach(cell => {
+            let val = extractCellText(cell);
+            if (val.startsWith('http://') || val.startsWith('https://')) {
+              val = `<a href="${val}" target="_blank" rel="noopener noreferrer">${val}</a>`;
+            }
+            html += `<td>${val || '-'}</td>`;
+          });
+          html += '</tr>';
+        }
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+
+      filterTable('prosesTable', 'searchProses');
+    };
+
+    function loadDataProses() {
+      const oldScript = document.getElementById('jsonp-proses-script');
+      if (oldScript) oldScript.remove();
+
+      const script = document.createElement('script');
+      script.id = 'jsonp-proses-script';
+      const tqQuery = encodeURIComponent("SELECT A, B, C, D, E, F, G");
+      script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=Proses&tq=${tqQuery}&tqx=responseHandler:handleSheetProses`;
+      document.body.appendChild(script);
+    }
+
+    // 3. DATA SHEET SABRINA SCATTER (C2:H)
+    window.handleSheetSabrinaScatter = function(response) {
+      const container = document.getElementById('sabrinaContent');
+      if (!response || !response.table || !response.table.rows || response.table.rows.length === 0) {
+        container.innerHTML = '<p style="color: var(--accent-red);">Data sheet Sabrina Scatter kosong atau tidak dapat diakses.</p>';
+        return;
+      }
+
+      const rows = response.table.rows;
+      const headers = ['TANGGAL', 'USER ID', 'PRIODE', 'SS SEAMLESS', 'NOMINAL', 'TOTAL KLAIM'];
+
+      let html = '<table id="sabrinaTable" class="proses-table"><thead><tr>';
+      headers.forEach(header => {
+        html += `<th>${header}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      rows.forEach(row => {
+        if (row.c) {
+          let vals = row.c.map(cell => extractCellText(cell).toUpperCase());
+          
+          const isHeaderRow = vals.some(v => ['USER ID', 'USERID', 'PRIODE', 'PERIODE', 'SS SEAMLESS', 'NOMINAL', 'TOTAL KLAIM'].includes(v));
+          if (isHeaderRow) return;
+
+          html += '<tr>';
+          row.c.forEach(cell => {
+            let val = extractCellText(cell);
+            if (val.startsWith('http://') || val.startsWith('https://')) {
+              val = `<a href="${val}" target="_blank" rel="noopener noreferrer">${val}</a>`;
+            }
+            html += `<td>${val || '-'}</td>`;
+          });
+          html += '</tr>';
+        }
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+
+      filterTable('sabrinaTable', 'searchSabrina');
+    };
+
+    function loadDataSabrinaScatter() {
+      const oldScript = document.getElementById('jsonp-sabrina-script');
+      if (oldScript) oldScript.remove();
+
+      const script = document.createElement('script');
+      script.id = 'jsonp-sabrina-script';
+      const sheetName = encodeURIComponent('Sabrina scatter');
+      const tqQuery = encodeURIComponent("SELECT C, D, E, F, G, H");
+      script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${sheetName}&tq=${tqQuery}&tqx=responseHandler:handleSheetSabrinaScatter`;
+      document.body.appendChild(script);
+    }
+
+    function filterTable(tableId, inputId) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+
+      const filter = input.value.toUpperCase().trim();
+      const table = document.getElementById(tableId);
+      if (!table) return;
+
+      const tbody = table.querySelector('tbody');
+      if (!tbody) return;
+
+      const rows = tbody.getElementsByTagName('tr');
+
+      for (let i = 0; i < rows.length; i++) {
+        let rowText = rows[i].textContent || rows[i].innerText;
+        if (rowText.toUpperCase().indexOf(filter) > -1) {
+          rows[i].style.display = '';
+        } else {
+          rows[i].style.display = 'none';
+        }
+      }
+    }
+
+    function populateDropdowns() {
+      const selectHariIni = document.getElementById('selectHariIni');
+      const selectBesok = document.getElementById('selectBesok');
+
+      let currentValHariIni = selectHariIni.value;
+      let currentValBesok = selectBesok.value;
+
+      if (allParsedBlocks.length === 0) {
+        selectHariIni.innerHTML = '<option value="">-- DATA KOSONG --</option>';
+        selectBesok.innerHTML = '<option value="">-- DATA KOSONG --</option>';
+        return;
+      }
+
+      const todayStr = getTanggalDynamic(0);
+      const tomorrowStr = getTanggalDynamic(1);
+
+      let optionsHariIni = '<option value="">-- PILIH PASARAN --</option>';
+      let optionsBesok = '<option value="">-- PILIH PASARAN --</option>';
+
+      allParsedBlocks.forEach((item, index) => {
+        optionsHariIni += `<option value="${index}">${item.name.toUpperCase()} (${todayStr})</option>`;
+        optionsBesok += `<option value="${index}">${item.name.toUpperCase()} (${tomorrowStr})</option>`;
+      });
+
+      selectHariIni.innerHTML = optionsHariIni;
+      selectBesok.innerHTML = optionsBesok;
+
+      if (currentValHariIni !== "") selectHariIni.value = currentValHariIni;
+      if (currentValBesok !== "") selectBesok.value = currentValBesok;
+
+      lastDateCheck = todayStr;
+    }
+
+    // --- FUNGSI FORMAT PREDIKSI DENGAN PERBAIKAN LOGIKA TWIN & INVEST TWIN ---
+    function formatPrediksiLive(item, offsetDays = 0) {
+      if (!item || !item.lines) return '';
+
+      const targetDateStr = getTanggalDynamic(offsetDays);
+
+      // Buat pool twin (00 - 99) dan kocok urutannya untuk pasaran ini
+      const twinPool = ['00', '11', '22', '33', '44', '55', '66', '77', '88', '99'];
+      const shuffledTwins = [...twinPool].sort(() => 0.5 - Math.random());
+      
+      // Ambil twin set yang konsisten
+      const twinUtamaText = shuffledTwins.slice(0, 3).join(' / ');
+      const investTwinText = shuffledTwins.slice(0, 5).join(' / ');
+
+      return item.lines.map((line, index) => {
+        if (index === 0) return line;
+
+        const isDateLine = index === 1 || /^(SENIN|SELASA|RABU|KAMIS|JUMAT|SABTU|MINGGU)/i.test(line);
+        if (isDateLine) {
+          return targetDateStr;
+        }
+
+        // Tangani baris TWIN
+        if (/^TWIN/i.test(line)) {
+          return `TWIN ${twinUtamaText}`;
+        }
+
+        // Tangani baris INVEST TWIN
+        if (/^INVEST TWIN/i.test(line)) {
+          return `INVEST TWIN ${investTwinText}`;
+        }
+
+        // Untuk baris lainnya, lakukan pengacakan angka acak biasa
+        return line.replace(/\b\d+\b/g, (match) => {
+          let randomDigits = '';
+          for (let i = 0; i < match.length; i++) {
+            randomDigits += Math.floor(Math.random() * 10);
+          }
+          return randomDigits;
+        });
+      }).join('\n');
+    }
+
+    function renderAllPasaranList() {
+      const containerHariIni = document.getElementById('containerAllHariIni');
+      const containerBesok = document.getElementById('containerAllBesok');
+
+      if (allParsedBlocks.length === 0) {
+        containerHariIni.innerHTML = '<p style="color: var(--accent-red);">Data kosong.</p>';
+        containerBesok.innerHTML = '<p style="color: var(--accent-red);">Data kosong.</p>';
+        return;
+      }
+
+      let htmlHariIni = '';
+      let htmlBesok = '';
+
+      allParsedBlocks.forEach((item, index) => {
+        htmlHariIni += `
+          <div class="pasaran-card-box">
+            <button class="copy-btn-mini" onclick="salinDirect('textHariIni_${index}')">SALIN</button>
+            <div id="textHariIni_${index}" class="pasaran-card-text">${formatPrediksiLive(item, 0)}</div>
+          </div>
+        `;
+
+        htmlBesok += `
+          <div class="pasaran-card-box">
+            <button class="copy-btn-mini" onclick="salinDirect('textBesok_${index}')">SALIN</button>
+            <div id="textBesok_${index}" class="pasaran-card-text">${formatPrediksiLive(item, 1)}</div>
+          </div>
+        `;
+      });
+
+      containerHariIni.innerHTML = htmlHariIni;
+      containerBesok.innerHTML = htmlBesok;
+    }
+
+    function salinSemuaPasaran(offsetDays = 0) {
+      if (allParsedBlocks.length === 0) {
+        alert('Data pasaran belum siap/kosong!');
+        return;
+      }
+
+      let fullTextArray = [];
+
+      allParsedBlocks.forEach((item, index) => {
+        const idPrefix = offsetDays === 0 ? 'textHariIni_' : 'textBesok_';
+        const elem = document.getElementById(`${idPrefix}${index}`);
+        
+        if (elem) {
+          fullTextArray.push(elem.innerText);
+        } else {
+          fullTextArray.push(formatPrediksiLive(item, offsetDays));
+        }
+      });
+
+      const resultText = fullTextArray.join('\n\n');
+
+      navigator.clipboard.writeText(resultText).then(() => {
+        showToast();
+      });
+    }
+
+    function displayPrediksi(type) {
+      const select = document.getElementById(type === 'hariIni' ? 'selectHariIni' : 'selectBesok');
+      const resultBox = document.getElementById(type === 'hariIni' ? 'resultHariIni' : 'resultBesok');
+      const val = select.value;
+
+      if (val === '') {
+        resultBox.style.display = 'none';
+        return;
+      }
+
+      const offset = (type === 'besok') ? 1 : 0;
+      const item = allParsedBlocks[val];
+
+      resultBox.innerText = formatPrediksiLive(item, offset);
+      resultBox.style.display = 'block';
+    }
+
+    function startLiveRandomizer() {
+      if (randomizeInterval) clearInterval(randomizeInterval);
+
+      randomizeInterval = setInterval(() => {
+        const currentTodayStr = getTanggalDynamic(0);
+        if (lastDateCheck !== '' && lastDateCheck !== currentTodayStr) {
+          populateDropdowns();
+        }
+
+        ['hariIni', 'besok'].forEach(type => {
+          const select = document.getElementById(type === 'hariIni' ? 'selectHariIni' : 'selectBesok');
+          const resultBox = document.getElementById(type === 'hariIni' ? 'resultHariIni' : 'resultBesok');
+          const val = select.value;
+
+          if (val !== '' && resultBox.style.display === 'block') {
+            const offset = (type === 'besok') ? 1 : 0;
+            const item = allParsedBlocks[val];
+            resultBox.innerText = formatPrediksiLive(item, offset);
+          }
+        });
+
+        allParsedBlocks.forEach((item, index) => {
+          const elemHariIni = document.getElementById(`textHariIni_${index}`);
+          const elemBesok = document.getElementById(`textBesok_${index}`);
+
+          if (elemHariIni) elemHariIni.innerText = formatPrediksiLive(item, 0);
+          if (elemBesok) elemBesok.innerText = formatPrediksiLive(item, 1);
+        });
+
+      }, 2000);
+    }
+
+    function salinText(type) {
+      const select = document.getElementById(type === 'hariIni' ? 'selectHariIni' : 'selectBesok');
+      const resultBox = document.getElementById(type === 'hariIni' ? 'resultHariIni' : 'resultBesok');
+      const val = select.value;
+
+      if (val === '') {
+        alert('Pilih pasaran terlebih dahulu!');
+        return;
+      }
+
+      navigator.clipboard.writeText(resultBox.innerText).then(() => {
+        showToast();
+      });
+    }
+
+    function salinDirect(elemId) {
+      const elem = document.getElementById(elemId);
+      if (!elem) return;
+
+      navigator.clipboard.writeText(elem.innerText).then(() => {
+        showToast();
+      });
+    }
+
+    // 4. LOGIKA PASSWORD GENERATOR
+    function generatePassword() {
+      const length = parseInt(document.getElementById('pgLength').value);
+      const incUpper = document.getElementById('pgUpper').checked;
+      const incLower = document.getElementById('pgLower').checked;
+      const incNumbers = document.getElementById('pgNumbers').checked;
+      const incSymbols = document.getElementById('pgSymbols').checked;
+
+      const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+      const numberChars = '0123456789';
+      const symbolChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+      let charPool = '';
+      if (incUpper) charPool += upperChars;
+      if (incLower) charPool += lowerChars;
+      if (incNumbers) charPool += numberChars;
+      if (incSymbols) charPool += symbolChars;
+
+      if (charPool === '') {
+        alert('Pilih minimal satu jenis karakter!');
+        return;
+      }
+
+      let password = '';
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charPool.length);
+        password += charPool.charAt(randomIndex);
+      }
+
+      document.getElementById('pgOutput').value = password;
+    }
+
+    function copyPassword() {
+      const passVal = document.getElementById('pgOutput').value;
+      if (!passVal) {
+        alert('Buat password terlebih dahulu!');
+        return;
+      }
+      navigator.clipboard.writeText(passVal).then(() => {
+        showToast();
+      });
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 2000);
+    }
+
+    // Jalankan awal
+    window.onload = function() {
+      loadData();
+      startLiveRandomizer();
+    };
+  </script>
+</body>
+</html>
